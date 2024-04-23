@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "bencode": "^0.9.0",
+    "bignum": "^0.13.1",
     "torrent-parser": "^1.2.0"
   }
 }
