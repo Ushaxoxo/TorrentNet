@@ -1,7 +1,11 @@
 'use strict';
 
-const fs = require('fs');
-const bencode = require('bencode');
+const tracker = require('./tracker');
+const torrentParser = require('./torrent-parser');
 
-const torrent = bencode.decode(fs.readFileSync('puppy.torrent'));
-console.log(torrent.announce.toString('utf8'));
+const torrent = torrentParser.open('Freeplane-Setup-1.11.12.exe.torrent');
+
+tracker.getPeers(torrent, peers => {
+  console.log('list of peers: ', peers);
+});
+
