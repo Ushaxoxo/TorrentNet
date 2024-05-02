@@ -134,3 +134,68 @@ module.exports.buildPort = payload => {
   buf.writeUInt16BE(payload, 5);
   return buf;
 };
+
+module.exports.parse = msg => {
+    const id = msg.length > 4 ? msg.readInt8(4) : null;
+    let payload = msg.length > 5 ? msg.slice(5) : null;
+    if (id === 6 || id === 7 || id === 8) {
+      const rest = payload.slice(8);
+      payload = {
+        index: payload.readInt32BE(0),
+        begin: payload.readInt32BE(4)
+      };
+      payload[id === 7 ? 'block' : 'length'] = rest;
+    }
+  
+    return {
+      size : msg.readInt32BE(0),
+      id : id,
+      payload : payload
+    }
+  };
+
+  module.exports = torrent => {
+    const requested = [];
+    tracker.getPeers(torrent, peers => {
+      peers.forEach(peer => download(peer, torrent, requested));
+    });
+  };
+
+  function download(peer, torrent, requested) {
+    // ...
+    const queue = [];
+    onWholeMsg(socket, msg => msgHandler(msg, socket, requested, queue));
+  }
+
+  function msgHandler(msg, socket, requested, queue) {
+    // ...
+    if (m.id === 4) haveHandler(m.payload, socket, requested, queue);
+    if (m.id === 7) pieceHandler(m.payload, socket, requested, queue);
+  }
+
+  function haveHandler(payload, socket, requested, queue) {
+    // ...
+    const pieceIndex = payload.readUInt32BE(0);
+    queue.push(pieceIndex);
+    if (queue.length === 1) {
+      requestPiece(socket, requested, queue);
+    }
+  }
+
+  function pieceHandler(payload, socket, requested, queue) {
+    // ...
+    queue.shift();
+    requestPiece(socket, requested, queue);
+  }
+
+  function requestPiece(socket, requested, queue) {
+    if (requested[queue[0]]) {
+      queue.shift();
+    } else {
+      // this is pseudo-code, as buildRequest actually takes slightly more
+      // complex arguments
+      socket.write(message.buildRequest(pieceIndex));
+    }
+  }
+
+  
