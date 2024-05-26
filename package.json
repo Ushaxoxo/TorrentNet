@@ -11,6 +11,8 @@
   "dependencies": {
     "bencode": "^0.9.0",
     "bignum": "^0.13.1",
+    "bittorrent-dht": "^11.0.5",
+    "magnet-uri": "^7.0.5",
     "torrent-parser": "^1.2.0"
   }
 }

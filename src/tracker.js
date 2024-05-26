@@ -15,8 +15,6 @@ module.exports.getPeers = (torrent, callback) => {
   udpSend(socket, buildConnReq(), url);
 
   socket.on('message', response => {
-    console.log('Received response:', response);
-
     if (respType(response) === 'connect') {
       // 2. receive and parse connect response
       const connResp = parseConnResp(response);
@@ -87,7 +85,7 @@ function buildAnnounceReq(connId, torrent, port=6881) {
   // event
   buf.writeUInt32BE(0, 80);
   // ip address
-  buf.writeUInt32BE(0, 80);
+  buf.writeUInt32BE(0, 84);
   // key
   crypto.randomBytes(4).copy(buf, 88);
   // num want
